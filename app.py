@@ -186,6 +186,9 @@ with gr.Blocks(theme=gr.themes.Soft(), css=css) as demo:
             prompt,  # Update the prompt input field
         ]
 
+    def reset_cached_prompt():
+        return gr.update(value=None)
+
     submit_btn.click(
         fn=process_input,
         inputs=[prompt_input, cached_prompts],
@@ -224,6 +227,10 @@ with gr.Blocks(theme=gr.themes.Soft(), css=css) as demo:
             reevaluation,
             prompt_input,
         ],
+    ).then(
+        fn=reset_cached_prompt,
+        inputs=[],
+        outputs=[cached_prompts],
     )
 
     # Add an event listener for the cached_prompts dropdown
