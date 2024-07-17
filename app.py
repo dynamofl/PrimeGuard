@@ -10,11 +10,7 @@ with open("cached_results.json", "r") as f:
 
 # Define constants
 model = LitellmModel(model_id="mistral/open-mistral-7b")
-env = Environment(
-    loader=FileSystemLoader(
-        "/Users/blazej/Desktop/projects/gradio_primeguard/templates"
-    )
-)
+env = Environment(loader=FileSystemLoader("templates"))
 no_violation_template_name = "answer_utility.j2"
 potential_violation_template_name_first_turn = "display_analysis.j2"
 potential_violation_template_name_second_turn = "get_answer.j2"
