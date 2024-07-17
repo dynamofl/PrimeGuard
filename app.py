@@ -275,4 +275,4 @@ with gr.Blocks(theme=gr.themes.Soft(), css=css) as demo:
     )
 
 demo.queue(max_size=20)
-demo.launch(max_threads=40, auth=("dynamo123", "dynamo321"))
+demo.launch(max_threads=40)
