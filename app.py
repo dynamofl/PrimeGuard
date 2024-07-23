@@ -1,8 +1,8 @@
 import gradio as gr
-from model import LitellmModel
-from utils import route_templates, extract_and_eval_json
 from jinja2 import Environment, FileSystemLoader
 import json
+from model import LitellmModel
+from routing import route
 
 # Load cached results
 with open("cached_results.json", "r") as f:
@@ -11,89 +11,46 @@ with open("cached_results.json", "r") as f:
 # Define constants
 model = LitellmModel(model_id="mistral/open-mistral-7b")
 env = Environment(loader=FileSystemLoader("templates"))
-no_violation_template_name = "answer_utility.j2"
-potential_violation_template_name_first_turn = "display_analysis.j2"
-potential_violation_template_name_second_turn = "get_answer.j2"
-direct_violation_template_name = "refusal.j2"
-
 
 def process_input(prompt, cached_prompt):
+    """
+    Process the input prompt, giving priority to cached prompts if selected.
+
+    Args:
+        prompt (str): The user-entered prompt from the text input.
+        cached_prompt (str): The selected cached prompt from the dropdown.
+
+    Returns:
+        tuple: Contains the processed results and UI update information.
+    """
+    # Use the cached prompt if one is selected, otherwise use the user-entered prompt
     if cached_prompt:
         prompt = cached_prompt
 
-    cached_result = next(
-        (item for item in cached_results if item["prompt"] == prompt), None
-    )
+    # Call the route function to process the prompt
+    result = route(prompt, model, env, cached_results)
 
-    if cached_result:
-        route = cached_result["route"]
-        vanilla_result = cached_result["vanilla_result"]
-        primeguard_answer = cached_result["primeguard_result"]
-        system_check_result = cached_result["system_check"]
-        system_tip = cached_result["system_tip"]
-        reevaluation = cached_result["reevaluation"]
-    else:
-        # Vanilla Approach
-        system_instructions = env.get_template("oai_safety.j2").render()
-        vanilla_result = model.batch_call([prompt], system_prompt=system_instructions)[
-            0
-        ]
-
-        # PrimeGuard Approach
-        routing_template = env.get_template("route_selection.j2")
-        routing_rendered = routing_template.render(
-            system_prompt=system_instructions, user_input=prompt
-        )
-        route_selection_output = model.batch_call([routing_rendered])[0]
-
-        final_conv, routes, system_check_results, system_tips = route_templates(
-            route_selection_outputs=[route_selection_output],
-            prompts=[prompt],
-            restrictive_system_instructions=system_instructions,
-            env=env,
-            no_violation_template_name=no_violation_template_name,
-            potential_violation_template_name_first_turn=potential_violation_template_name_first_turn,
-            potential_violation_template_name_second_turn=potential_violation_template_name_second_turn,
-            direct_violation_template_name=direct_violation_template_name,
-        )
-
-        final_output = model.batch_call(final_conv)[0]
-
-        primeguard_answer = final_output
-        reevaluation = "N/A"
-        if routes[0] == "potential_violation":
-            parsed_json = extract_and_eval_json(final_output)
-            if len(parsed_json) > 0:
-                if (
-                    "reevaluation" in parsed_json[0].keys()
-                    and "final_response" in parsed_json[0].keys()
-                ):
-                    reevaluation = parsed_json[0]["reevaluation"]
-                    primeguard_answer = parsed_json[0]["final_response"]
-
-        route = routes[0]
-        system_tip = system_tips[0]
-        system_check_result = system_check_results[0]
-
+    # Prepare button updates based on the routing result
     button_updates = [
         gr.update(variant="secondary"),
         gr.update(variant="secondary"),
         gr.update(variant="secondary"),
     ]
-    if route == "no_to_minimal_risk":
+    if result["route"] == "no_to_minimal_risk":
         button_updates[0] = gr.update(variant="primary")
-    elif route == "potential_violation":
+    elif result["route"] == "potential_violation":
         button_updates[1] = gr.update(variant="primary")
-    elif route == "direct_violation":
+    elif result["route"] == "direct_violation":
         button_updates[2] = gr.update(variant="primary")
 
+    # Return all the results and UI updates
     return (
-        vanilla_result,
-        primeguard_answer,
+        result["vanilla_result"],
+        result["primeguard_result"],
         *button_updates,
-        system_check_result,
-        system_tip,
-        reevaluation,
+        result["system_check"],
+        result["system_tip"],
+        result["reevaluation"],
         prompt,  # Return the prompt to update the input field
     )
 
