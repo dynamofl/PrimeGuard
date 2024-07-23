@@ -1,15 +1,3 @@
----
-title: PrimeGuard
-emoji: 📊
-colorFrom: pink
-colorTo: yellow
-sdk: gradio
-sdk_version: 4.38.1
-app_file: app.py
-pinned: false
-license: apache-2.0
----
-
 # 🛡️ PrimeGuard Implementation
 
 This repository contains an implementation of PrimeGuard, an approach from the paper "PrimeGuard: Safe and Helpful LLMs through Tuning-Free Routing" presented at the ICML 2024 NextGenAISafety workshop.
