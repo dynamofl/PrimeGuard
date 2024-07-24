@@ -1,7 +1,7 @@
 # 🛡️ PrimeGuard Implementation
 
 This repository contains an implementation of PrimeGuard, an approach from the paper "PrimeGuard: Safe and Helpful LLMs through Tuning-Free Routing" presented at the ICML 2024 NextGenAISafety workshop.
-Paper can be found here [[Link]](https://github.com/dynamofl/primeguard).
+Paper can be found here [[Link]](https://arxiv.org/abs/2407.16318).
 
 ## 📁 Contents
 
