@@ -1,10 +1,11 @@
 # 🛡️ PrimeGuard Implementation
 
 This repository contains an implementation of PrimeGuard, an approach from the paper "PrimeGuard: Safe and Helpful LLMs through Tuning-Free Routing" presented at the ICML 2024 NextGenAISafety workshop.
+Paper can be found here [[Link]](https://arxiv.org/abs/2407.16318).
 
 ## 📁 Contents
 
-- Templates for in-context learning of routing
+- Templates for in-context learning of routing in `templates`
 - Routing logic in `routing.py`
 - Gradio demo in `app.py`
 - Requirements listed in `requirements.txt`
@@ -53,7 +54,19 @@ python app.py
 
 This will start a local server where you can interact with the PrimeGuard implementation.
 
-## 📚 References
+## 📚 Citatiopn
 
-For more details on the PrimeGuard approach, please refer to the original paper.
+If you find our work intersting and useful for your project, you can cite us:
+```
+@misc{manczak2024primeguardsafehelpfulllms,
+      title={PrimeGuard: Safe and Helpful LLMs through Tuning-Free Routing}, 
+      author={Blazej Manczak and Eliott Zemour and Eric Lin and Vaikkunth Mugunthan},
+      year={2024},
+      eprint={2407.16318},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2407.16318}, 
+}
+```
+
 Happy routing! 🎉
